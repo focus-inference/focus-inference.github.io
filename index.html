@@ -945,16 +945,8 @@
       height: 1.1em;
       margin-left: 2px;
       vertical-align: -0.15em;
-      background: currentColor;
+      background: #cbd5e1;
       animation: blink 1s steps(1, end) infinite;
-    }
-
-    .lane-base .cursor {
-      color: var(--base);
-    }
-
-    .lane-focus .cursor {
-      color: var(--focus);
     }
 
     .lane-base {
@@ -2001,7 +1993,8 @@
       playing: true,
       speed: 8,
       rafId: null,
-      lastFrameAt: null
+      lastFrameAt: null,
+      restartTimerId: null
     };
 
     const playButton = document.getElementById('playButton');
@@ -2148,11 +2141,28 @@
     function stopPlayback() {
       state.playing = false;
       state.lastFrameAt = null;
+      if (state.restartTimerId) {
+        clearTimeout(state.restartTimerId);
+        state.restartTimerId = null;
+      }
       if (state.rafId) {
         cancelAnimationFrame(state.rafId);
         state.rafId = null;
       }
       render();
+    }
+
+    function scheduleLoopRestart() {
+      if (state.restartTimerId) return;
+      state.lastFrameAt = null;
+      state.restartTimerId = setTimeout(() => {
+        state.restartTimerId = null;
+        if (!state.playing) return;
+        state.currentMs = 0;
+        state.lastFrameAt = null;
+        render();
+        state.rafId = requestAnimationFrame(frame);
+      }, 1000);
     }
 
     function frame(now) {
@@ -2165,9 +2175,9 @@
       state.currentMs = Math.min(replayMaxMs, state.currentMs + elapsed * state.speed);
       render();
       if (state.currentMs >= replayMaxMs) {
-        state.currentMs = 0;
-        state.lastFrameAt = now;
-        render();
+        state.rafId = null;
+        scheduleLoopRestart();
+        return;
       }
       state.rafId = requestAnimationFrame(frame);
     }
