@@ -870,7 +870,7 @@
     .stat-pill strong {
       order: 2;
       font-family: var(--mono);
-      font-size: 1.04rem;
+      font-size: 0.98rem;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -1843,7 +1843,9 @@
     }
 
     function fmtTokens(value) {
-      return value == null ? '--' : `${Math.round(value)} tok`;
+      if (value == null) return '--';
+      const rounded = Math.round(value);
+      return `${rounded} ${rounded === 1 ? 'token' : 'tokens'}`;
     }
 
     function fmtRatio(value) {
