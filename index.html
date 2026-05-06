@@ -850,17 +850,18 @@
     }
 
     .lane-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
     .stat-pill {
-      display: inline-flex;
+      display: flex;
       align-items: baseline;
-      gap: 7px;
-      min-height: 34px;
-      padding: 6px 10px;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 42px;
+      padding: 8px 12px;
       border-radius: var(--radius-md);
       background: var(--bg-alt);
       border: 1px solid var(--line);
@@ -869,14 +870,16 @@
     .stat-pill strong {
       order: 2;
       font-family: var(--mono);
-      font-size: 0.9rem;
+      font-size: 1.04rem;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     .stat-pill span {
       order: 1;
       color: var(--muted);
-      font-size: 0.78rem;
+      font-size: 0.82rem;
+      white-space: nowrap;
     }
 
     .output-shell {
