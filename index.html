@@ -976,6 +976,22 @@
       line-height: 1.6;
     }
 
+    .copy-citation {
+      min-height: 36px;
+      padding: 0 14px;
+      font-size: 0.88rem;
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid var(--line-strong);
+      box-shadow: none;
+    }
+
+    .copy-citation:disabled {
+      cursor: default;
+      color: var(--muted);
+      border-color: var(--line);
+    }
+
     @keyframes blink {
       50% {
         opacity: 0;
@@ -1791,8 +1807,9 @@
     <section class="panel citation-panel" id="citation">
       <div class="section-head">
         <h2 class="section-title">Citation</h2>
+        <button class="copy-citation" id="copyCitation" type="button">Copy BibTeX</button>
       </div>
-      <pre>@article{liang2026focus,
+      <pre id="citationBibtex">@article{liang2026focus,
   title   = {FOCUS: DLLMs Know How to Tame Their Compute Bound},
   author  = {Kaihua Liang and Xin Tan and An Zhong and Hong Xu and Marco Canini},
   journal = {arXiv preprint arXiv:2601.23278},
@@ -2003,6 +2020,8 @@
     const timeline = document.getElementById('timeline');
     const timelineValue = document.getElementById('timelineValue');
     const playState = document.getElementById('playState');
+    const copyCitationButton = document.getElementById('copyCitation');
+    const citationBibtex = document.getElementById('citationBibtex');
 
     timeline.max = String(Math.ceil(replayMaxMs));
 
@@ -2209,6 +2228,42 @@
       state.currentMs = Number(timeline.value) || 0;
       stopPlayback();
       playButton.textContent = 'Play Replay';
+    });
+
+    async function copyText(text) {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.setAttribute('readonly', '');
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      const copied = document.execCommand('copy');
+      textArea.remove();
+      if (!copied) {
+        throw new Error('Copy command failed');
+      }
+    }
+
+    copyCitationButton.addEventListener('click', async () => {
+      const originalLabel = 'Copy BibTeX';
+      copyCitationButton.disabled = true;
+      try {
+        await copyText(citationBibtex.textContent.trim());
+        copyCitationButton.textContent = 'Copied';
+      } catch (error) {
+        copyCitationButton.textContent = 'Copy failed';
+      } finally {
+        setTimeout(() => {
+          copyCitationButton.textContent = originalLabel;
+          copyCitationButton.disabled = false;
+        }, 1400);
+      }
     });
 
     buildReplayMeta();
