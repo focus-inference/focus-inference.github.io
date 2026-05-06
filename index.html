@@ -2077,8 +2077,7 @@
       const ratio = processedRatio(req);
       const stats = [
         ['Emitted tokens', fmtTokens(tokensAt(req, state.currentMs))],
-        ['Total tokens', fmtTokens(req?.generated_tokens)],
-        ['Decode span', fmtMs(requestDecodeSpan(req))]
+        ['Total tokens', fmtTokens(req?.generated_tokens)]
       ];
       const host = document.getElementById(prefix + 'Stats');
       host.innerHTML = stats.map(([label, value]) => (
